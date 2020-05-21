@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  #web server
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./app/src:/usr/share/nginx/html
+      # nginx configs
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/:/etc/nginx/conf.d/:ro
+      # nginx log
+      - ./nginx/log:/var/log/nginx:rw
+      - ./nginx/www:/var/www
+      - ./nginx/etc/letsencrypt:/etc/letsencrypt
+      # nginx ssl
+      - ./nginx/cert:/etc/nginx/cert
+    links:
+      - php:php-cgi
+  # php-fpm
+  php:
+    build: ./php-fpm
+    volumes:
+      - ./app/src:/usr/share/nginx/html
+      - ./php-fpm/php.ini:/usr/local/php/etc/php.ini:ro
+      - ./php-fpm/php-fpm.conf:/usr/local/php/etc/php-fpm.conf:ro
+      - ./php-fpm/www.conf:/usr/local/php/etc/php-fpm.d/www.conf:ro
+      - ./php-fpm/var:/usr/local/php/var
+    links:
+      - mysql:mysql
+    ports:
+      - "9009:9000"
+    stdin_open: true
+    tty: true
+
+  #database
+  mysql:
+    image: mysql:5.6
+    ports:
+      - "3309:3306"
+    volumes:
+      - ./mysql/mysqldb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
