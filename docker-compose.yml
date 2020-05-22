@@ -35,6 +35,7 @@ services:
     ports:
       - "9009:9000"
     stdin_open: true
+    container_name: php-fpm7.3
     tty: true
 
   #database
