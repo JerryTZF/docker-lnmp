@@ -21,7 +21,26 @@ services:
       - ./nginx/cert:/etc/nginx/cert
     links:
       - php:php-cgi
-  # php-fpm
+      - php56:php56-cgi
+
+  # php56-fpm
+  php56:
+    build: ./php5.6-fpm
+    volumes:
+      - ./app/src:/usr/share/nginx/html
+      - ./php5.6-fpm/php.ini:/usr/local/php/etc/php.ini:ro
+      - ./php5.6-fpm/php-fpm.conf:/usr/local/php/etc/php-fpm.conf:ro
+      - ./php5.6-fpm/www.conf:/usr/local/php/etc/php-fpm.d/www.conf:ro
+      - ./php5.6-fpm/var:/usr/local/php/var
+    links:
+      - mysql:mysql
+    ports:
+      - "9010:9000"
+    container_name: php-fpm5.6
+    stdin_open: true
+    tty: true
+
+  # php73-fpm
   php:
     build: ./php-fpm
     volumes:
